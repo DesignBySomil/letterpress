@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<title>Letterpress</title>
+<meta name="theme-color" content="#1a1815">
+<meta name="description" content="Type. Every letter is pressed into the paper.">
+<style>
+@font-face{font-family:"Fell";src:url(https://fonts.gstatic.com/s/imfellenglish/v14/Ktk1ALSLW8zDe0rthJysWrnLsAz3Fw.ttf) format("truetype");font-display:block}
+@font-face{font-family:"Fell";font-style:italic;src:url(https://fonts.gstatic.com/s/imfellenglish/v14/Ktk3ALSLW8zDe0rthJysWrnLsAzHFaOd.ttf) format("truetype");font-display:block}
+@font-face{font-family:"FellSC";src:url(https://fonts.gstatic.com/s/imfellenglishsc/v16/a8IENpD3CDX-4zrWfr1VY879qFF05pZLOw.ttf) format("truetype");font-display:block}
+:root{--vh:100dvh;--card-w:min(88vw, calc((var(--vh) - 175px) * .8), 640px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#171512;overscroll-behavior:none}
+body{height:var(--vh);font-family:"FellSC",Georgia,serif;color:#cdbf9f;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#desk{position:fixed;inset:0;background:
+ radial-gradient(120% 90% at var(--lx,40%) var(--ly,22%), #3a352c 0%, #25221d 38%, #14120f 100%);}
+#desk::after{content:"";position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay;pointer-events:none;
+ background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+#stage{position:fixed;left:0;right:0;top:0;bottom:calc(var(--vh) * 0 + 0px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,28px);padding:30px 0 max(8px,env(safe-area-inset-bottom))}
+#sheetWrap{position:relative;width:var(--card-w);aspect-ratio:4/5;perspective:1400px;will-change:transform}
+#sheet{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .18s ease-out;will-change:transform}
+#gl{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5)) drop-shadow(0 14px 22px rgba(0,0,0,.45)) drop-shadow(0 38px 50px rgba(0,0,0,.35));touch-action:none}
+#caret{position:absolute;width:2px;border-radius:1px;background:linear-gradient(#c79a45,#8d6523);box-shadow:0 0 6px rgba(199,154,69,.65);opacity:.9;animation:pulse 1.15s ease-in-out infinite;pointer-events:none;transition:left .09s ease-out,top .12s ease-out}
+@keyframes pulse{50%{opacity:.25}}
+#hint{left:0;right:0;text-align:center;font-size:clamp(10px,1.6vw,12px);letter-spacing:.32em;text-transform:uppercase;color:#8c7e62;opacity:0;transition:opacity .8s;pointer-events:none;position:fixed;top:max(12px,env(safe-area-inset-top))}
+#hint.on{opacity:1}
+#bar{display:flex;align-items:center;gap:clamp(12px,3vw,22px);width:var(--card-w);justify-content:space-between;transform:translateX(130%);transition:transform .9s cubic-bezier(.2,1.25,.3,1)}
+#bar.in{transform:none}
+#meta{display:flex;align-items:center;gap:10px}
+.pot{width:26px;height:26px;border-radius:50%;border:0;padding:0;position:relative;cursor:pointer;
+ background:radial-gradient(circle at 34% 28%, var(--hl) 0 12%, var(--c) 46%, #000 120%);
+ box-shadow:0 0 0 2px #1a1815, 0 0 0 3.5px #6f5a2e, 0 3px 6px rgba(0,0,0,.6), inset 0 -2px 3px rgba(0,0,0,.5);transition:transform .2s}
+.pot[aria-pressed=true]{transform:translateY(-3px) scale(1.12);box-shadow:0 0 0 2px #1a1815, 0 0 0 3.5px #e1b862, 0 6px 9px rgba(0,0,0,.6), inset 0 -2px 3px rgba(0,0,0,.5)}
+#no{font-size:12px;letter-spacing:.2em;color:#8c7e62;margin-left:6px;white-space:nowrap}
+#key{position:relative;border:0;background:none;padding:0 0 9px;cursor:pointer;outline:none;font-family:"FellSC",Georgia,serif}
+#key .top{display:flex;align-items:center;justify-content:center;gap:10px;height:56px;min-width:158px;padding:0 26px;border-radius:30px;position:relative;z-index:2;
+ color:#3b2a0c;font-size:19px;letter-spacing:.28em;text-indent:.28em;text-shadow:0 1px 0 rgba(255,236,180,.8),0 -1px 0 rgba(70,44,6,.5);
+ background:
+  linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0) 46%),
+  conic-gradient(from 210deg at 50% 50%, #e9c476, #b88a36 18%, #f4dc9c 34%, #a67a2c 52%, #e7c06c 68%, #9a6f26 84%, #e9c476);
+ box-shadow:inset 0 0 0 2px rgba(255,238,190,.55), inset 0 -5px 8px rgba(110,70,10,.45), inset 0 3px 5px rgba(255,255,255,.4);
+ transition:transform .09s ease-out}
+#key::before{content:"";position:absolute;left:3px;right:3px;top:8px;bottom:0;border-radius:30px;background:linear-gradient(#7a5517,#4a310b);box-shadow:0 10px 16px rgba(0,0,0,.6),0 2px 0 #2a1b05;z-index:1}
+#key:active .top,#key.down .top{transform:translateY(8px)}
+#key:focus-visible .top{outline:2px solid #fff6d0;outline-offset:3px}
+#key svg{width:18px;height:18px}
+#ta{position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;font-size:16px;border:0;padding:0;resize:none;background:none;color:transparent;caret-color:transparent;pointer-events:none}
+#toast{position:fixed;left:50%;top:max(18px,env(safe-area-inset-top));transform:translate(-50%,-40px);opacity:0;background:#e9dfc6;color:#2a2418;padding:9px 18px;border-radius:20px;font-size:13px;letter-spacing:.18em;transition:all .45s cubic-bezier(.2,1.3,.4,1);box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:5;pointer-events:none}
+#toast.on{transform:translate(-50%,0);opacity:1}
+#nogl{display:none;position:fixed;inset:0;place-items:center;text-align:center;padding:30px;color:#cdbf9f;font-size:18px}
+@media (max-height:560px){#hint{display:none}}
+@media (prefers-reduced-motion:reduce){#bar{transition:none}}
+</style>
+</head>
+<body>
+<div id="desk"></div>
+<div id="stage">
+  <div id="sheetWrap">
+    <div id="sheet"><canvas id="gl" width="1200" height="1500" aria-label="A sheet of cream paper. Type to press letters into it."></canvas><div id="caret"></div></div>
+  </div>
+  <div id="bar">
+    <div id="meta">
+      <button class="pot" data-ink="0" style="--c:#16202e;--hl:#5d7391" aria-label="Indigo black ink" aria-pressed="true"></button>
+      <button class="pot" data-ink="1" style="--c:#5b0f12;--hl:#b4545a" aria-label="Oxblood ink" aria-pressed="false"></button>
+      <button class="pot" data-ink="2" style="--c:#12301f;--hl:#5a9674" aria-label="Pine ink" aria-pressed="false"></button>
+      <span id="no">№ 001</span>
+    </div>
+    <button id="key" aria-label="Press the sheet and save it as an image"><span class="top"><span>PRESS</span></span></button>
+  </div>
+</div>
+<div id="hint">type &middot; ink doesn&rsquo;t erase</div>
+<textarea id="ta" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Type here"></textarea>
+<div id="toast"></div>
+<div id="nogl">This needs WebGL2 to light the paper. Try another browser.</div>
+<script src="letterpress.js"></script>
+</body>
+</html>
